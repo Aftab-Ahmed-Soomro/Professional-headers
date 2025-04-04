@@ -14,8 +14,10 @@ import { IoClose } from 'react-icons/io5';
 const ExecutiveDashboard = () => {
     const [active, setActive] = useState("Users");
     const [expandedItems, setExpandedItems] = useState({});
+    const [hoveredItem, setHoveredItem] = useState(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const dropdownRefs = useRef({});
+    const hoverTimeoutRef = useRef(null);
 
     const menuItems = [
         { name: "Search", icon: <CiSearch size={20} /> },
@@ -65,6 +67,41 @@ const ExecutiveDashboard = () => {
       setActive(itemName);
     };
 
+    // Handle mouse enter for hover functionality
+    const handleMouseEnter = (itemName) => {
+      // Clear any existing timeout to prevent race conditions
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      
+      // Small delay to prevent flickering when moving between items
+      hoverTimeoutRef.current = setTimeout(() => {
+        setHoveredItem(itemName);
+      }, 100);
+    };
+
+    // Handle mouse leave for hover functionality
+    const handleMouseLeave = () => {
+      // Clear any existing timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      
+      // Add a small delay before closing to make the UI feel more responsive
+      hoverTimeoutRef.current = setTimeout(() => {
+        setHoveredItem(null);
+      }, 300);
+    };
+
+    // Clean up timeouts when component unmounts
+    useEffect(() => {
+      return () => {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+        }
+      };
+    }, []);
+
     // Close dropdowns when clicking outside
     useEffect(() => {
       function handleClickOutside(event) {
@@ -83,6 +120,11 @@ const ExecutiveDashboard = () => {
     
     // Get currently active menu item with children
     const activeMenu = testingItems.find(item => item.name === active);
+
+    // Helper function to determine if dropdown should be shown
+    const shouldShowDropdown = (itemName) => {
+      return expandedItems[itemName] || hoveredItem === itemName;
+    };
 
     return (
       <div className="min-h-screen bg-[#131519]">
@@ -227,19 +269,25 @@ const ExecutiveDashboard = () => {
                 ${active === item.name ? "bg-[#1F2A39] text-white border-blue-500" : "hover:text-white hover:bg-[#1F2A39]"}`}
                 tabIndex="0"
                 onClick={() => toggleExpand(item.name)}
+                onMouseEnter={() => handleMouseEnter(item.name)}
+                onMouseLeave={handleMouseLeave}
               >
                 <div className="flex items-center gap-1 xl:gap-3">
                   <span className="text-blue-400">{item.icon}</span>
                   <p className="text-base xl:text-md font-bold">{item.name}</p>
                   <MdKeyboardArrowDown 
-                    className={`ml-1 transition-transform duration-200 ${expandedItems[item.name] ? 'rotate-180' : ''}`} 
+                    className={`ml-1 transition-transform duration-200 ${shouldShowDropdown(item.name) ? 'rotate-180' : ''}`} 
                     size={18} 
                   />
                 </div>
 
                 {/* Submenu */}
-                {expandedItems[item.name] && (
-                  <div className="absolute top-full left-0 w-max min-w-full bg-[#25293A] py-3 px-4 shadow-md z-50 transition-all duration-300 border-t border-gray-700 mt-3 rounded-b-lg">
+                {shouldShowDropdown(item.name) && (
+                  <div 
+                    className="absolute top-full left-0 w-max min-w-full bg-[#25293A] py-3 px-4 shadow-md z-50 transition-all duration-300 border-t border-gray-700 mt-3 rounded-b-lg"
+                    onMouseEnter={() => handleMouseEnter(item.name)}
+                    onMouseLeave={handleMouseLeave}
+                  >
                     <ul className="flex flex-col text-white max-h-100">
                       {item.children.map((childItem) => (
                         <li 
@@ -273,7 +321,7 @@ const ExecutiveDashboard = () => {
 
         {/* Main content area */}
         <div className="p-4 md:p-8">
-          {activeMenu && expandedItems[activeMenu.name] ? (
+          {activeMenu && (expandedItems[activeMenu.name] || hoveredItem === activeMenu.name) ? (
             <div className="bg-[#1A1A1A] rounded-lg p-4 md:p-6 text-white">
               <h2 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-4">{activeMenu.name} Dashboard</h2>
               <p className="text-sm md:text-base text-[#59606B]">You've selected the {activeMenu.name} section. Choose an option from the submenu above.</p>
