@@ -194,18 +194,19 @@ const ExecutiveDashboard = () => {
         </div>
 
         {/* Desktop Header Navigation */}
-        <div className="hidden lg:flex bg-[#1A1A1A] px-4 xl:px-10 justify-between w-full overflow-visible shadow-md">
+        <div className="hidden lg:flex bg-[#1A1A1A] py-2 px-4 xl:px-10 justify-between w-full overflow-visible shadow-md">
           <div className="flex items-center gap-3 cursor-pointer">
             {/* Logo */}
             <img className="h-12" src="./images/logo.webp" alt="Logo" />
             <h1 className="text-lg text-white font-bold">Techmile Solutions</h1>
           </div>
 
-          <div className="text-[#59606B] flex items-center py-1 px-2 xl:px-4 gap-1 xl:gap-3">
+          {/* Main menu items - flex-shrink-0 added to prevent wrapping */}
+          <div className="text-[#59606B] flex items-center py-1 px-2 xl:px-4 gap-1 xl:gap-3 whitespace-nowrap">
             {menuItems.map((item) => (
               <div
                 key={item.name}
-                className={`flex items-center gap-1 xl:gap-3 cursor-pointer px-2 xl:px-4 py-2 xl:py-3 text-md rounded-lg transition-all border-2 border-[#1A1A1A] focus:border-2 focus:border-blue-500 hover:shadow-lg
+                className={`flex-shrink-0 flex items-center gap-1 xl:gap-3 cursor-pointer px-2 xl:px-4 py-2 xl:py-3 text-md rounded-lg transition-all border-2 border-[#1A1A1A] focus:border-2 focus:border-blue-500 hover:shadow-lg
                 ${active === item.name ? "bg-[#1F2A39] text-white border-blue-500" : "hover:text-white hover:bg-[#1F2A39]"}`}
                 tabIndex="0"
                 onClick={() => setActive(item.name)}
@@ -216,12 +217,13 @@ const ExecutiveDashboard = () => {
             ))}
           </div>
 
-          <div className="text-[#59606B] flex items-center py-1 px-2 xl:px-4 gap-1 xl:gap-3">
+          {/* Testing items */}
+          <div className="text-[#59606B] flex items-center py-1 px-2 xl:px-4 gap-1 xl:gap-3 whitespace-nowrap">
             {testingItems.map((item) => (
               <div
                 key={item.name}
                 ref={el => dropdownRefs.current[item.name] = el}
-                className={`relative flex flex-col cursor-pointer px-2 xl:px-4 py-2 xl:py-3 text-md rounded-lg transition-all border-2 border-[#1A1A1A] focus:border-2 focus:border-blue-500 hover:shadow-lg
+                className={`flex-shrink-0 relative flex flex-col cursor-pointer px-2 xl:px-4 py-2 xl:py-3 text-md rounded-lg transition-all border-2 border-[#1A1A1A] focus:border-2 focus:border-blue-500 hover:shadow-lg
                 ${active === item.name ? "bg-[#1F2A39] text-white border-blue-500" : "hover:text-white hover:bg-[#1F2A39]"}`}
                 tabIndex="0"
                 onClick={() => toggleExpand(item.name)}
@@ -237,7 +239,7 @@ const ExecutiveDashboard = () => {
 
                 {/* Submenu */}
                 {expandedItems[item.name] && (
-                  <div className="absolute top-full left-0 w-full bg-[#25293A] py-3 px-4 shadow-md z-50 transition-all duration-300 border-t border-gray-700 mt-3 rounded-b-lg">
+                  <div className="absolute top-full left-0 w-max min-w-full bg-[#25293A] py-3 px-4 shadow-md z-50 transition-all duration-300 border-t border-gray-700 mt-3 rounded-b-lg">
                     <ul className="flex flex-col text-white max-h-100">
                       {item.children.map((childItem) => (
                         <li 
@@ -255,7 +257,7 @@ const ExecutiveDashboard = () => {
             ))}
           </div>
 
-          <div className="text-white flex items-center gap-2 xl:gap-5">
+          <div className="text-white flex items-center gap-2 xl:gap-5 flex-shrink-0">
             <div className="h-8 xl:h-10 w-8 xl:w-10 cursor-pointer bg-[#1F2A39] rounded-full flex items-center justify-center">
               <FaUserCircle className="h-6 xl:h-8 w-6 xl:w-8 text-blue-400" />
             </div>
